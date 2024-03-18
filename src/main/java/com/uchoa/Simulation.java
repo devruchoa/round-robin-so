@@ -15,62 +15,44 @@ import java.util.Random;
 
 public class Simulation {
     public static void main(String[] args) throws Exception {
-        int maxQuantum = 100;
-        int simulationsPerQuantum = 10;
-
         List<Job> jobs = new ArrayList<>();
         Random random = new Random();
 
-        for (int i = 0; i < 100; i++) {
-            int burstTime = (int) (50 + 10 * random.nextGaussian());
-            burstTime = Math.max(burstTime, 1);
-            jobs.add(new Job(burstTime, 0));
-        }
-
-        XYSeries seriesWaitingTime = new XYSeries("Average Waiting Time");
-        XYSeries seriesTurnaroundTime = new XYSeries("Average Turnaround Time");
-        XYSeries seriesThroughput = new XYSeries("Throughput");
-
-        for (int quantum = 1; quantum <= maxQuantum; quantum++) {
-            double totalWaitingTime = 0;
-            double totalTurnaroundTime = 0;
-            double totalThroughput = 0;
-
-            for (int i = 0; i < simulationsPerQuantum; i++) {
-                RoundRobin roundRobin = new RoundRobin(1);
-                for (Job job : jobs) {
-                    roundRobin.addProcess(new Job(job.burstTime, job.arrivalTime));
-                }
-                roundRobin.execute(quantum);
-                totalWaitingTime += roundRobin.averageWaitingTime();
-                totalTurnaroundTime += roundRobin.averageTurnaroundTime();
-                totalThroughput += roundRobin.throughput();
-            }
-
-            double averageWaitingTime = totalWaitingTime / simulationsPerQuantum;
-            double averageTurnaroundTime = totalTurnaroundTime / simulationsPerQuantum;
-            double averageThroughput = totalThroughput / simulationsPerQuantum;
-
-            seriesWaitingTime.add(quantum, averageWaitingTime);
-            seriesTurnaroundTime.add(quantum, averageTurnaroundTime);
-            seriesThroughput.add(quantum, averageThroughput);
-
-            System.out.println("Quantum: " + quantum);
-            System.out.println("Average Waiting Time: " + averageWaitingTime);
-            System.out.println("Average Turnaround Time: " + averageTurnaroundTime);
-            System.out.println("Throughput: " + averageThroughput);
-            System.out.println();
+        for (int i = 0; i < 20; i++) {
+            double burstTime = 1 + random.nextDouble() * 10;
+            double arrivalTime = 0;
+            jobs.add(new Job(burstTime, arrivalTime));
         }
 
         XYSeriesCollection dataset = new XYSeriesCollection();
-        dataset.addSeries(seriesWaitingTime);
-        dataset.addSeries(seriesTurnaroundTime);
-        dataset.addSeries(seriesThroughput);
+        XYSeries series1 = new XYSeries("Average Waiting Time");
+        XYSeries series2 = new XYSeries("Average Turnaround Time");
+        XYSeries series3 = new XYSeries("Throughput");
+
+        for (int quantum = 1; quantum <= 10; quantum++) {
+            RoundRobin rr = new RoundRobin(1);
+            for (Job job : jobs) {
+                rr.addProcess(job);
+            }
+            rr.execute(quantum);
+
+            double avgWaitingTime = rr.averageWaitingTime();
+            double avgTurnaroundTime = rr.averageTurnaroundTime();
+            double throughput = rr.throughput();
+
+            series1.add(quantum, avgWaitingTime);
+            series2.add(quantum, avgTurnaroundTime);
+            series3.add(quantum, throughput);
+        }
+
+        dataset.addSeries(series1);
+        dataset.addSeries(series2);
+        dataset.addSeries(series3);
 
         JFreeChart chart = ChartFactory.createXYLineChart(
-                "Metrics by Quantum",
+                "Round Robin Scheduling Metrics",
                 "Quantum",
-                "Metrics",
+                "Value",
                 dataset
         );
 
