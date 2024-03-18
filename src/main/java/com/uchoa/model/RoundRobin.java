@@ -1,9 +1,9 @@
 package com.uchoa.model;
 
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 public class RoundRobin {
     Queue<Job> queue = new LinkedList<>();
@@ -17,20 +17,24 @@ public class RoundRobin {
 
     public void addProcess(Job process) {
         queue.add(new Job(process.burstTime, process.arrivalTime));
+        System.out.println("Adicionado processo: " + process);
     }
 
     public void execute(int quantum) {
         while (!queue.isEmpty()) {
             Job process = queue.poll();
+            System.out.println("Iniciando execução do processo: " + process);
             if (process.burstTime > quantum) {
                 process.burstTime -= quantum;
                 currentTime += quantum;
+                System.out.println("Processo " + process + " executou por " + quantum + " unidades de tempo");
                 for (Job job : queue) {
                     job.waitingTime += quantum;
                 }
                 queue.add(new Job(process.burstTime, process.arrivalTime, process.waitingTime, process.turnAroundTime));
             } else {
                 currentTime += process.burstTime;
+                System.out.println("Processo " + process + " completou a execução");
                 for (Job job : queue) {
                     job.waitingTime += process.burstTime;
                 }
@@ -39,6 +43,7 @@ public class RoundRobin {
                 finishedJobs.add(process);
             }
             currentTime += contextSwitchTime;
+            System.out.println("Tempo de troca de contexto: " + contextSwitchTime);
             if (!queue.isEmpty()) {
                 for (Job job : queue) {
                     job.waitingTime += contextSwitchTime;
@@ -48,14 +53,20 @@ public class RoundRobin {
     }
 
     public double averageWaitingTime() {
-        return finishedJobs.stream().mapToInt(p -> p.waitingTime).average().orElse(0);
+        double average = finishedJobs.stream().mapToInt(p -> p.waitingTime).average().orElse(0);
+        System.out.println("Tempo médio de espera: " + average);
+        return average;
     }
 
     public double averageTurnaroundTime() {
-        return finishedJobs.stream().mapToInt(p -> p.turnAroundTime).average().orElse(0);
+        double average = finishedJobs.stream().mapToInt(p -> p.turnAroundTime).average().orElse(0);
+        System.out.println("Tempo médio de retorno: " + average);
+        return average;
     }
 
     public double throughput() {
-        return (double) finishedJobs.size() / currentTime;
+        double throughput = (double) finishedJobs.size() / currentTime;
+        System.out.println("Vazão: " + throughput);
+        return throughput;
     }
 }
