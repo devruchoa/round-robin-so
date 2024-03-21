@@ -1,16 +1,18 @@
 package com.uchoa.model;
 
 public class Job {
+    private String name;
     private double burstTime;
     private double arrivalTime;
     private double waitingTime;
     private double turnAroundTime;
 
-    public Job(double burstTime, double arrivalTime) {
-        this(burstTime, arrivalTime, 0, 0);
+    public Job(String name, double burstTime, double arrivalTime) {
+        this(name, burstTime, arrivalTime, 0, 0);
     }
 
-    public Job(double burstTime, double arrivalTime, double waitingTime, double turnAroundTime) {
+    public Job(String name, double burstTime, double arrivalTime, double waitingTime, double turnAroundTime) {
+        this.name = name;
         this.burstTime = burstTime;
         this.arrivalTime = arrivalTime;
         this.waitingTime = waitingTime;
@@ -47,5 +49,13 @@ public class Job {
 
     public void setTurnAroundTime(double turnAroundTime) {
         this.turnAroundTime = turnAroundTime;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

@@ -16,11 +16,12 @@ public class RoundRobin {
     }
 
     public void addProcess(Job process) {
-        queue.add(new Job(process.getBurstTime(), process.getArrivalTime()));
-        System.out.println("Adicionado processo: " + process);
+        queue.add(new Job(process.getName(), process.getBurstTime(), process.getArrivalTime()));
+        System.out.println("Adicionado processo: " + process.getName());
     }
 
     public void execute(int quantum) {
+        System.out.println("Executando Round Robin com quantum " + quantum);
         while (!queue.isEmpty()) {
             Job process = queue.poll();
             if (process.getBurstTime() > quantum) {
@@ -30,7 +31,7 @@ public class RoundRobin {
                     job.setWaitingTime(job.getWaitingTime() + quantum);
                 }
                 queue.add(process);
-                System.out.println("Processo " + process + " executou por " + quantum + " unidades de tempo");
+                System.out.println("Processo " + process.getName() + " executou por " + quantum + " unidades de tempo");
             } else {
                 currentTime += process.getBurstTime();
                 for (Job job : queue) {
@@ -39,7 +40,7 @@ public class RoundRobin {
                 process.setTurnAroundTime(currentTime - process.getArrivalTime());
                 process.setBurstTime(0);
                 finishedJobs.add(process);
-                System.out.println("Processo " + process + " completou a execução");
+                System.out.println("Processo " + process.getName() + " completou a execução");
             }
             currentTime += contextSwitchTime;
             System.out.println("Tempo de troca de contexto: " + contextSwitchTime);

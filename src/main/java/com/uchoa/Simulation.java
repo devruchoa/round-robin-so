@@ -21,7 +21,7 @@ public class Simulation {
         for (int i = 0; i < 20; i++) {
             double burstTime = 1 + random.nextDouble() * 10;
             double arrivalTime = 0;
-            jobs.add(new Job(burstTime, arrivalTime));
+            jobs.add(new Job(String.valueOf(i + 1), burstTime, arrivalTime));
         }
 
         XYSeriesCollection dataset = new XYSeriesCollection();
